@@ -1,5 +1,4 @@
 # TODO list
 
-- [ ] item 1
-- [ ] item 2
-- [ ] item 3
+- [ ] attend the git & github session 1
+- [ ] go home

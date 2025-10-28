@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dr Robo — Roboticist Portfolio</title>
+  <meta name="description" content="Welcome page for a roboticist — interactive demo, projects, skills, and contact." />
+
+  <!-- Tailwind via CDN (good for GitHub Pages single-file) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{--glass:rgba(255,255,255,0.06);--glass-2:rgba(255,255,255,0.04)}
+    html,body{font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    .frost {backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);}
+    /* Robot eyes follow cursor */
+    .eye{transition: transform .08s linear}
+    /* Floating particle canvas fallback */
+    #particles{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0}
+    /* subtle focus styles */
+    a:focus, button:focus, input:focus{outline:3px solid rgba(99,102,241,0.16); outline-offset:2px}
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 text-slate-100 min-h-screen relative overflow-x-hidden">
+
+  <!-- Particles background (simple) -->
+  <canvas id="particles"></canvas>
+
+  <main class="relative z-10 px-6 py-12 max-w-6xl mx-auto">
+    <header class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-4">
+        <div class="rounded-full p-1 bg-gradient-to-br from-teal-400 to-blue-500 shadow-lg">
+          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-slate-800 to-slate-700 flex items-center justify-center text-xl font-bold">R</div>
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold">Dr Robo — Roboticist</h1>
+          <p class="text-sm text-slate-300">Designing intelligent machines & interactive systems</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a class="text-sm px-3 py-2 bg-white/6 rounded-md hover:bg-white/10 transition" href="#projects">Projects</a>
+        <a class="text-sm px-3 py-2 bg-white/6 rounded-md hover:bg-white/10 transition" href="#demos">Demos</a>
+        <a class="text-sm px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md transition" href="#contact">Contact</a>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="grid md:grid-cols-2 gap-8 items-center">
+
+      <div class="space-y-4">
+        <h2 class="text-4xl font-extrabold leading-tight">Hello — I'm <span class="text-teal-300">Dr Robo</span></h2>
+        <p class="text-slate-300">I build autonomous robots, perception systems and human-robot interactions. Explore live demos, project write-ups and code samples below. This page is a compact interactive portfolio prepared for publishing on GitHub Pages.</p>
+
+        <div class="flex gap-3 mt-4">
+          <a class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-teal-400 to-blue-500 shadow-md text-black font-semibold hover:scale-105 transform transition" href="#demos">Try Demos</a>
+          <a class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition" href="#projects">View Projects</a>
+        </div>
+
+        <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-3 rounded-lg bg-white/4 frost">
+            <div class="text-sm text-slate-300">Languages</div>
+            <div class="font-semibold">Python, C++, ROS</div>
+          </div>
+          <div class="p-3 rounded-lg bg-white/4 frost">
+            <div class="text-sm text-slate-300">Domain</div>
+            <div class="font-semibold">Perception • Controls • HRI</div>
+          </div>
+          <div class="p-3 rounded-lg bg-white/4 frost">
+            <div class="text-sm text-slate-300">Tooling</div>
+            <div class="font-semibold">ROS2 • OpenCV • PyTorch</div>
+          </div>
+          <div class="p-3 rounded-lg bg-white/4 frost">
+            <div class="text-sm text-slate-300">Availability</div>
+            <div class="font-semibold">Open to collaboration</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Robot Card -->
+      <div class="relative p-6 rounded-2xl bg-gradient-to-b from-white/4 to-white/2 border border-white/6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="text-sm text-slate-300">Interactive robot — try moving your cursor</div>
+            <div class="font-semibold">R-Unit v2</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-slate-300">Color</label>
+            <input id="colorPicker" type="color" value="#4fd1c5" class="w-8 h-8 p-0 border-0 rounded-md" title="Change robot color">
+          </div>
+        </div>
+
+        <div id="robot" class="mx-auto w-full h-64 flex items-center justify-center">
+          <!-- SVG robot with eyes that follow cursor -->
+          <svg id="robot-svg" width="280" height="220" viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="6" stdDeviation="12" flood-opacity="0.3"/>
+              </filter>
+            </defs>
+
+            <!-- body -->
+            <g id="robot-group">
+              <rect x="40" y="40" rx="20" ry="20" width="200" height="140" fill="#123" opacity="0.12"/>
+              <rect id="robot-body" x="60" y="60" rx="16" ry="16" width="160" height="110" fill="#4fd1c5" filter="url(#shadow)"/>
+
+              <!-- eyes -->
+              <g id="eyes" transform="translate(0,0)">
+                <circle cx="110" cy="110" r="18" fill="#fff"/>
+                <circle cx="170" cy="110" r="18" fill="#fff"/>
+                <circle id="eyeL" class="eye" cx="110" cy="110" r="8" fill="#111"/>
+                <circle id="eyeR" class="eye" cx="170" cy="110" r="8" fill="#111"/>
+              </g>
+
+              <!-- mouth / display -->
+              <rect x="95" y="138" width="90" height="10" rx="5" fill="#0b1220" opacity="0.6"/>
+              <text id="mood" x="140" y="148" text-anchor="middle" font-size="9" fill="#9ae6b4">Ready</text>
+
+              <!-- antenna -->
+              <line x1="140" y1="28" x2="140" y2="60" stroke="#fff" stroke-opacity="0.3" stroke-width="2"/>
+              <circle id="antenna" cx="140" cy="24" r="8" fill="#ffb703"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="mt-4 text-sm text-slate-300">Try: move cursor to make the robot look at you. Click the robot to make it wave.</div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="mt-12">
+      <h3 class="text-2xl font-bold mb-4">Selected Projects</h3>
+      <div class="grid md:grid-cols-3 gap-4">
+
+        <article class="p-4 rounded-xl bg-white/4 frost border border-white/6">
+          <h4 class="font-semibold">Autonomous Delivery Rover</h4>
+          <p class="text-sm text-slate-300 my-2">ROS2-based multi-sensor platform for indoor navigation and person-following.</p>
+          <div class="flex items-center justify-between mt-3">
+            <div class="text-xs text-slate-300">Stack: ROS2, Lidar, SLAM, RTAB-Map</div>
+            <button class="text-sm px-3 py-1 bg-indigo-600 rounded-md" data-project="rover">Read</button>
+          </div>
+        </article>
+
+        <article class="p-4 rounded-xl bg-white/4 frost border border-white/6">
+          <h4 class="font-semibold">Vision-based Manipulation</h4>
+          <p class="text-sm text-slate-300 my-2">Deep-learning grasp planner + real-time object detection for pick-and-place tasks.</p>
+          <div class="flex items-center justify-between mt-3">
+            <div class="text-xs text-slate-300">Stack: PyTorch, OpenCV, MoveIt</div>
+            <button class="text-sm px-3 py-1 bg-indigo-600 rounded-md" data-project="manip">Read</button>
+          </div>
+        </article>
+
+        <article class="p-4 rounded-xl bg-white/4 frost border border-white/6">
+          <h4 class="font-semibold">HRI Study — Social Robot</h4>
+          <p class="text-sm text-slate-300 my-2">User studies on expressivity and trust in assistive robots.</p>
+          <div class="flex items-center justify-between mt-3">
+            <div class="text-xs text-slate-300">Stack: UX, ROS, Qualitative</div>
+            <button class="text-sm px-3 py-1 bg-indigo-600 rounded-md" data-project="hri">Read</button>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Demos -->
+    <section id="demos" class="mt-12">
+      <h3 class="text-2xl font-bold mb-4">Interactive Demos</h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl bg-white/4 frost border border-white/6">
+          <h4 class="font-semibold">Simulated Lidar — Range Visualiser</h4>
+          <p class="text-sm text-slate-300 my-2">Generate a fake LIDAR scan and see obstacle mapping in realtime.</p>
+          <canvas id="lidar" class="w-full h-56 bg-black/25 rounded-md"></canvas>
+          <div class="mt-3 flex gap-2">
+            <button id="start-lidar" class="px-3 py-1 bg-teal-400 rounded-md text-black">Start</button>
+            <button id="stop-lidar" class="px-3 py-1 bg-white/6 rounded-md">Stop</button>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-white/4 frost border border-white/6">
+          <h4 class="font-semibold">Path Planner — Draw a path</h4>
+          <p class="text-sm text-slate-300 my-2">Click to place waypoints and run a smoothing algorithm.</p>
+          <canvas id="planner" class="w-full h-56 bg-black/25 rounded-md"></canvas>
+          <div class="mt-3 flex gap-2">
+            <button id="clear-planner" class="px-3 py-1 bg-indigo-600 rounded-md">Clear</button>
+            <button id="smooth-planner" class="px-3 py-1 bg-teal-400 text-black rounded-md">Smooth</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="mt-12 mb-24 grid md:grid-cols-2 gap-6">
+      <div class="p-6 rounded-xl bg-white/4 frost border border-white/6">
+        <h3 class="text-xl font-bold">Get in touch</h3>
+        <p class="text-sm text-slate-300 mt-2">For collaborations, media, or talks — drop an email or connect on GitHub.</p>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li>Email: <a href="mailto:you@domain.com" class="text-teal-300">you@domain.com</a></li>
+          <li>GitHub: <a href="https://github.com/yourusername" target="_blank" class="text-teal-300">@yourusername</a></li>
+          <li>Resume: <a href="#" class="text-teal-300">Download (PDF)</a> — replace with your file</li>
+        </ul>
+      </div>
+
+      <form class="p-6 rounded-xl bg-white/4 frost border border-white/6" onsubmit="event.preventDefault(); alert('This is a demo. Replace with your form endpoint.');">
+        <h3 class="text-xl font-bold">Message</h3>
+        <label class="block mt-3 text-sm">Name
+          <input class="mt-1 block w-full rounded-md p-2 bg-transparent border border-white/8" required></label>
+        <label class="block mt-3 text-sm">Email
+          <input class="mt-1 block w-full rounded-md p-2 bg-transparent border border-white/8" type="email" required></label>
+        <label class="block mt-3 text-sm">Message
+          <textarea class="mt-1 block w-full rounded-md p-2 bg-transparent border border-white/8" rows="4" required></textarea></label>
+        <div class="mt-3">
+          <button type="submit" class="px-4 py-2 rounded-md bg-indigo-600">Send</button>
+        </div>
+      </form>
+    </section>
+
+    <footer class="text-center text-sm text-slate-400 py-6">© 2025 Dr Robo • Built for GitHub Pages • Template — edit freely</footer>
+  </main>
+
+  <!-- Modals and small scripts -->
+  <div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-6">
+    <div class="bg-slate-900 rounded-xl max-w-2xl w-full p-6 text-slate-100">
+      <button id="modal-close" class="float-right">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script>
+    // small helper
+    const el = (s)=>document.querySelector(s);
+
+    // Particle background (simple) — lightweight
+    (function(){
+      const c = document.getElementById('particles');
+      const ctx = c.getContext('2d');
+      function resize(){c.width=innerWidth; c.height=innerHeight}
+      addEventListener('resize',resize); resize();
+      const parts=[]; for(let i=0;i<80;i++){parts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.6+0.3,vx:(Math.random()-0.5)/2,vy:(Math.random()-0.5)/2})}
+      function step(){ctx.clearRect(0,0,c.width,c.height); for(const p of parts){p.x+=p.vx; p.y+=p.vy; if(p.x<0)p.x=c.width; if(p.x>c.width)p.x=0; if(p.y<0)p.y=c.height; if(p.y>c.height)p.y=0; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fill()} requestAnimationFrame(step)}
+      step();
+    })();
+
+    // Robot interactivity
+    (function(){
+      const svg = el('#robot-svg');
+      const eyeL = el('#eyeL');
+      const eyeR = el('#eyeR');
+      const mood = el('#mood');
+      const body = el('#robot-body');
+      const antenna = el('#antenna');
+      const colorPicker = el('#colorPicker');
+
+      colorPicker.addEventListener('input', (e)=>{body.setAttribute('fill', e.target.value)})
+
+      // eyes follow cursor
+      document.addEventListener('mousemove', (ev)=>{
+        const rect = svg.getBoundingClientRect();
+        const cx = rect.left + rect.width/2; const cy = rect.top + rect.height/2;
+        // map cursor to limited offset
+        const max = 6;
+        const dx = Math.max(-max, Math.min(max, (ev.clientX - cx)/20));
+        const dy = Math.max(-max, Math.min(max, (ev.clientY - cy)/20));
+        eyeL.setAttribute('transform', `translate(${dx},${dy})`);
+        eyeR.setAttribute('transform', `translate(${dx},${dy})`);
+      });
+
+      // click to wave
+      svg.addEventListener('click', ()=>{
+        mood.textContent = 'Hello!';
+        antenna.animate([{transform:'scale(1)'},{transform:'scale(1.4)'},{transform:'scale(1)'}],{duration:700});
+        setTimeout(()=>mood.textContent='Ready',1200);
+      })
+    })();
+
+    // Project modal
+    (function(){
+      const modal = el('#modal'); const modalContent = el('#modal-content');
+      document.querySelectorAll('[data-project]').forEach(btn=>btn.addEventListener('click',()=>{
+        const id = btn.getAttribute('data-project');
+        let html = '<h3 class="text-lg font-bold mb-2">'+(id==='rover'?'Autonomous Delivery Rover':id==='manip'?'Vision-based Manipulation':'HRI Study — Social Robot')+'</h3>';
+        html += '<p class="text-sm text-slate-300">Detailed write-up placeholder. Replace with project description, links to code, dataset, and paper. Include images and video embeds for a richer page.</p>';
+        html += '<div class="mt-4 text-xs text-slate-400">Stack: ROS2 • Lidar • PyTorch • MoveIt • RTAB-Map</div>';
+        modalContent.innerHTML = html; modal.classList.remove('hidden'); modal.classList.add('flex');
+      }));
+      el('#modal-close').addEventListener('click', ()=>{modal.classList.add('hidden'); modal.classList.remove('flex')});
+    })();
+
+    // Simple LIDAR demo
+    (function(){
+      const c = el('#lidar'); const ctx = c.getContext('2d'); let anim=null;
+      function resize(){c.width=c.clientWidth*devicePixelRatio; c.height=c.clientHeight*devicePixelRatio; ctx.scale(devicePixelRatio,devicePixelRatio)}
+      addEventListener('resize', ()=>{ctx.setTransform(1,0,0,1,0,0); resize()}); resize();
+      function drawScan(){ctx.clearRect(0,0,c.width, c.height); const w=c.clientWidth, h=c.clientHeight; ctx.save(); ctx.translate(w/2,h/2);
+        // draw circle
+        ctx.beginPath(); ctx.arc(0,0,Math.min(w,h)/2-8,0,Math.PI*2); ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1; ctx.stroke();
+        // simulated points
+        for(let a=0;a<360;a+=6){const r = Math.min(1,0.2+Math.random()*0.9); const rad=a*(Math.PI/180); const x=Math.cos(rad)*r*(w/2-16); const y=Math.sin(rad)*r*(h/2-16); ctx.beginPath(); ctx.arc(x,y,2,0,Math.PI*2); ctx.fillStyle='rgba(99,102,241,0.9)'; ctx.fill();}
+        ctx.restore();
+      }
+      document.getElementById('start-lidar').addEventListener('click', ()=>{if(anim) return; anim=setInterval(drawScan,300)});
+      document.getElementById('stop-lidar').addEventListener('click', ()=>{clearInterval(anim); anim=null; ctx.clearRect(0,0,c.width,c.height)});
+    })();
+
+    // Planner demo (simple waypoint smoothing)
+    (function(){
+      const c = el('#planner'); const ctx = c.getContext('2d'); let points=[]; function resize(){c.width=c.clientWidth*devicePixelRatio; c.height=c.clientHeight*devicePixelRatio; ctx.setTransform(1,0,0,1,0,0); ctx.scale(devicePixelRatio,devicePixelRatio)}; resize(); addEventListener('resize', resize);
+      function draw(){ctx.clearRect(0,0,c.clientWidth,c.clientHeight); // draw waypoints
+        ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.fillRect(0,0,c.clientWidth,c.clientHeight);
+        ctx.strokeStyle='rgba(99,102,241,0.9)'; ctx.lineWidth=2; ctx.beginPath(); for(let i=0;i<points.length;i++){const p=points[i]; if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);} ctx.stroke();
+        for(const p of points){ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.fillStyle='rgba(99,102,241,0.9)'; ctx.fill();}
+      }
+      c.addEventListener('click',(e)=>{const r=c.getBoundingClientRect(); points.push({x:(e.clientX-r.left), y:(e.clientY-r.top)}); draw()});
+      el('#clear-planner').addEventListener('click', ()=>{points=[]; draw()});
+      el('#smooth-planner').addEventListener('click', ()=>{ // simple Chaikin smoothing
+        if(points.length<3) return; let newPts=[]; for(let i=0;i<points.length-1;i++){const p=points[i], q=points[i+1]; newPts.push({x:0.75*p.x+0.25*q.x, y:0.75*p.y+0.25*q.y}); newPts.push({x:0.25*p.x+0.75*q.x, y:0.25*p.y+0.75*q.y}); } points = newPts; draw(); });
+    })();
+
+    // Small accessibility tweak: prefers-reduced-motion
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('*').forEach(n=>n.style.transition='none')}
+  </script>
+</body>
+</html>
